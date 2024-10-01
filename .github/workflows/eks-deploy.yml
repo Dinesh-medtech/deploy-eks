@@ -9,6 +9,9 @@ on:
       ProjectName:
         required: false
         type: string
+      EksClusterName :
+        required: false
+        type: string
     secrets:
       AwsAcarinOIDCRole:
         required: true
