@@ -59,7 +59,7 @@ resource "aws_security_group" "eks_sg" {
 
 # Create EKS Cluster
 resource "aws_eks_cluster" "example" {
-  name     = "example-cluster"
+  name     = "my-eks-cluster"
   role_arn = aws_iam_role.eks_role.arn
 
   vpc_config {
