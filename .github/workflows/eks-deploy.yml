@@ -64,9 +64,9 @@ jobs:
         run: |
           cd terraform
           terraform init
-          terraform plan
-          terraform apply -auto-approve
-
+          terraform plan -var="eks_cluster_name=${{ inputs.EksClusterName }}" -var="aws_region=${{ inputs.AWSDefaultRegion }}"
+          terraform apply -auto-approve -var="eks_cluster_name=${{ inputs.EksClusterName }}" -var="aws_region=${{ inputs.AWSDefaultRegion }}"
+          
       - name: Configure kubectl
         run: |
           aws eks update-kubeconfig --name my-eks-cluster --region ${{ inputs.AWSDefaultRegion }}
