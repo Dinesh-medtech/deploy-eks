@@ -11,6 +11,7 @@ jobs:
     with:
       AWSDefaultRegion: us-east-1
       ProjectName: eks-deploy
+      EksClusterName: eks-cluster
     secrets:
       AwsAcarinOIDCRole: ${{ secrets.AWS_OIDC_ROLE_NONPROD }}
       AwsAccessKey: ${{ secrets.ACCESS_KEY_ID_NONPROD }}
