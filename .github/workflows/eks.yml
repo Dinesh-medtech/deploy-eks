@@ -1,0 +1,16 @@
+name: CI/CD
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: [main]
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/eks-deploy.yml
+    with:
+      AWSDefaultRegion: us-east-1
+      ProjectName: eks-deploy
+    secrets:
+      AwsAcarinOIDCRole: ${{ secrets.AWS_OIDC_ROLE_NONPROD }}
+      AwsAccessKey: ${{ secrets.ACCESS_KEY_ID_NONPROD }}
