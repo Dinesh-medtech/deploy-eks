@@ -76,5 +76,5 @@ jobs:
           
       - name: Deploy to EKS
         run: |
-          kubectl set image deployment/my-app my-app=${{ steps.build-image.outputs.image }}
+          kubectl apply -f deployment.yaml
           kubectl rollout status deployment/my-app
