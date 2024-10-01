@@ -1,3 +1,13 @@
+variable "eks_cluster_name" {
+  description = "Name of the EKS cluster"
+  type        = string
+}
+
+variable "aws_region" {
+  description = "AWS region"
+  type        = string
+}
+
 provider "aws" {
   region = "us-west-2"  # Change to your preferred region
 }
