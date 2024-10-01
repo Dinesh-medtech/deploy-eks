@@ -1,0 +1,26 @@
+- name: Deploy to EKS
+  run: |
+    kubectl apply -f - <<EOF
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: my-app
+      labels:
+        app: my-app
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: my-app
+      template:
+        metadata:
+          labels:
+            app: my-app
+        spec:
+          containers:
+          - name: my-app
+            image: ${{ steps.build-image.outputs.image }}
+            ports:
+            - containerPort: 80
+    EOF
+    kubectl rollout status deployment/my-app
