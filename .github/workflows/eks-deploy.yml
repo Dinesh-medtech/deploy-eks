@@ -1,0 +1,77 @@
+name: Deploy to EKS
+
+on:
+  workflow_call:
+    inputs:
+      AWSDefaultRegion:
+        required: false
+        type: string
+      ProjectName:
+        required: false
+        type: string
+    secrets:
+      AwsAcarinOIDCRole:
+        required: true
+      AwsAccessKey:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Step: Set AWS credentials using OIDC
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AwsAcarinOIDCRole }}
+          aws-region: ${{ inputs.AWSDefaultRegion }}
+          role-session-name: "GitHubActions"
+
+      # Step: Log in to Amazon ECR
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Create ECR repository
+        uses: int128/create-ecr-repository-action@v1
+        id: create-ecr-repo
+        with:
+          repository: ${{inputs.ProjectName}}
+          public: false
+
+      - name: Build, tag, and push Docker image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+          REPO_NAME: ${{ steps.create-ecr-repo.outputs.repository-uri }}
+        run: |
+          cd packages/frontend
+          docker build -f dockerfile -t $REPO_NAME:$IMAGE_TAG .
+          docker push $REPO_NAME:$IMAGE_TAG
+          echo "image=$REPO_NAME:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.4.0 
+
+      - name: Init, Plan, and Apply Terraform
+        run: |
+          cd terraform
+          terraform init
+          terraform plan
+          terraform apply -auto-approve
+
+      - name: Configure kubectl
+        run: |
+          aws eks update-kubeconfig --name my-eks-cluster --region ${{ inputs.AWSDefaultRegion }}
+          
+      - name: Deploy to EKS
+        run: |
+          kubectl set image deployment/my-app my-app=${{ steps.build-image.outputs.image }}
+          kubectl rollout status deployment/my-app
