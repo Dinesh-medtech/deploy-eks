@@ -53,7 +53,6 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
           REPO_NAME: ${{ steps.create-ecr-repo.outputs.repository-uri }}
         run: |
-          cd packages/frontend
           docker build -f dockerfile -t $REPO_NAME:$IMAGE_TAG .
           docker push $REPO_NAME:$IMAGE_TAG
           echo "image=$REPO_NAME:$IMAGE_TAG" >> $GITHUB_OUTPUT
@@ -77,4 +76,3 @@ jobs:
       - name: Deploy to EKS
         run: |
           kubectl apply -f deployment.yaml
-          kubectl rollout status deployment/my-app
