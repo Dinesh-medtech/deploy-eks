@@ -15,9 +15,7 @@ on:
     secrets:
       AwsAcarinOIDCRole:
         required: true
-      AwsAccessKey:
-        required: true
-
+      
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -71,7 +69,7 @@ jobs:
           
       - name: Configure kubectl
         run: |
-          aws eks update-kubeconfig --name my-eks-cluster --region ${{ inputs.AWSDefaultRegion }}
+          aws eks update-kubeconfig --name ${{ inputs.EksClusterName }} --region ${{ inputs.AWSDefaultRegion }}
           
       - name: Deploy to EKS
         run: |
