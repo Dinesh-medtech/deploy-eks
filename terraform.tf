@@ -9,7 +9,7 @@ variable "aws_region" {
 }
 
 provider "aws" {
-  region = "us-west-2"  # Change to your preferred region
+  region = var.aws_region
 }
 
 # Create VPC
@@ -69,7 +69,7 @@ resource "aws_security_group" "eks_sg" {
 
 # Create EKS Cluster
 resource "aws_eks_cluster" "example" {
-  name     = "my-eks-cluster"
+  name     = var.eks_cluster_name
   role_arn = aws_iam_role.eks_role.arn
 
   vpc_config {
