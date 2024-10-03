@@ -54,6 +54,11 @@ jobs:
           docker build -f dockerfile -t $REPO_NAME:$IMAGE_TAG .
           docker push $REPO_NAME:$IMAGE_TAG
           echo "image=$REPO_NAME:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "image-uri=$REPO_NAME:$IMAGE_TAG" >> $GITHUB_ENV
+
+      - name: Substitute image in deployment.yml
+        run: |
+          cat deployment.yml | envsubst > deployment-subst.yml
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
@@ -73,5 +78,5 @@ jobs:
           
       - name: Deploy to EKS
         run: |
-          kubectl apply -f deployment.yaml
+          kubectl apply -f deployment-subst.yml
           kubectl rollout status deployment/my-app
