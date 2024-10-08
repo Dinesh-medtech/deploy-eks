@@ -16,7 +16,7 @@
         spec:
           containers:
           - name: my-app
-            image: ${{ steps.build-image.outputs.image }}
+            image: $image-uri
             ports:
             - containerPort: 80
 
